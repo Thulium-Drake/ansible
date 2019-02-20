@@ -1,0 +1,56 @@
+---
+# This playbook will create/delete snapshots of all VMs in a specific hostgroup
+# or set of groups. It will resolve the path of the VM inside vCenter and
+# create/delete snapshots of the machine as follows:
+#
+# ansible_snap_$(date +%F)
+#
+# The script will normally prompt for a hostgroup and an action, it can also be
+# provided using the following commandline:
+#
+# ansible-playbook playbooks/vm-snapshots.yml --extra-vars="target_group=prod, target_action=present"
+#
+# Which will create snapshots for all machines in the 'prod' hostgroup.
+#
+# NOTE: This playbook does not support reverting snapshots at this time!
+#
+- hosts: localhost
+  gather_facts: no
+
+  vars_prompt:
+    - name: target_group
+      prompt: "What is the Ansible hostgroup you want to snapshot? (group1,group2)"
+      private: no
+    - name: target_action
+      prompt: "Specify the action to take: [present,absent,remove_all]"
+      private: no
+      default: "present"
+
+  tasks:
+  - block:
+	  - name: "Gather current date"
+	    setup:
+	      filter: ansible_date_time
+	  - name: "Locate VM in vSphere"
+	    vmware_guest_find:
+	      hostname: "{{ vsphere_host }}"
+	      username: "{{ vsphere_username }}"
+	      password: "{{ vsphere_password }}"
+	      validate_certs: "{{ vsphere_validate_certs }}"
+	      name: "{{ item }}"
+	    delegate_to: "{{ vpshere_api_host }}"
+	    register: vm_location
+	    loop: "{{ query('inventory_hostnames', '{{ target_group }}' ) }}"
+	  - name: "Execute snapshot action"
+	    vmware_guest_snapshot:
+	      hostname: "{{ vsphere_host }}"
+	      username: "{{ vsphere_username }}"
+	      password: "{{ vsphere_password }}"
+	      datacenter: "{{ item.folders[0].split('/')[1] }}"
+	      folder: "{{ item.folders[0] }}"
+	      name: "{{ item.item }}"
+	      validate_certs: "{{ vsphere_validate_certs }}"
+	      state: "{{ target_action }}"
+	      snapshot_name: "ansible_snap_{{ ansible_date_time.date }}"
+	    delegate_to: "{{ vpshere_api_host }}"
+	    with_items: "{{ vm_location['results'] }}"
