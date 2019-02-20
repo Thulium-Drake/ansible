@@ -28,29 +28,29 @@
 
   tasks:
   - block:
-	  - name: "Gather current date"
-	    setup:
-	      filter: ansible_date_time
-	  - name: "Locate VM in vSphere"
-	    vmware_guest_find:
-	      hostname: "{{ vsphere_host }}"
-	      username: "{{ vsphere_username }}"
-	      password: "{{ vsphere_password }}"
-	      validate_certs: "{{ vsphere_validate_certs }}"
-	      name: "{{ item }}"
-	    delegate_to: "{{ vpshere_api_host }}"
-	    register: vm_location
-	    loop: "{{ query('inventory_hostnames', '{{ target_group }}' ) }}"
-	  - name: "Execute snapshot action"
-	    vmware_guest_snapshot:
-	      hostname: "{{ vsphere_host }}"
-	      username: "{{ vsphere_username }}"
-	      password: "{{ vsphere_password }}"
-	      datacenter: "{{ item.folders[0].split('/')[1] }}"
-	      folder: "{{ item.folders[0] }}"
-	      name: "{{ item.item }}"
-	      validate_certs: "{{ vsphere_validate_certs }}"
-	      state: "{{ target_action }}"
-	      snapshot_name: "ansible_snap_{{ ansible_date_time.date }}"
-	    delegate_to: "{{ vpshere_api_host }}"
-	    with_items: "{{ vm_location['results'] }}"
+    - name: "Gather current date"
+      setup:
+        filter: ansible_date_time
+    - name: "Locate VM in vSphere"
+      vmware_guest_find:
+        hostname: "{{ vsphere_host }}"
+        username: "{{ vsphere_username }}"
+        password: "{{ vsphere_password }}"
+        validate_certs: "{{ vsphere_validate_certs }}"
+        name: "{{ item }}"
+      delegate_to: "{{ vpshere_api_host }}"
+      register: vm_location
+      loop: "{{ query('inventory_hostnames', '{{ target_group }}' ) }}"
+    - name: "Execute snapshot action"
+      vmware_guest_snapshot:
+        hostname: "{{ vsphere_host }}"
+        username: "{{ vsphere_username }}"
+        password: "{{ vsphere_password }}"
+        datacenter: "{{ item.folders[0].split('/')[1] }}"
+        folder: "{{ item.folders[0] }}"
+        name: "{{ item.item }}"
+        validate_certs: "{{ vsphere_validate_certs }}"
+        state: "{{ target_action }}"
+        snapshot_name: "ansible_snap_{{ ansible_date_time.date }}"
+      delegate_to: "{{ vpshere_api_host }}"
+      with_items: "{{ vm_location['results'] }}"
