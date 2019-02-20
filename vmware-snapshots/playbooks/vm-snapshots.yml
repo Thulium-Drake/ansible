@@ -1,56 +1,91 @@
 ---
-# This playbook will create/delete snapshots of all VMs in a specific hostgroup
+# This playbook will manage snapshots of all VMs in a specific hostgroup
 # or set of groups. It will resolve the path of the VM inside vCenter and
-# create/delete snapshots of the machine as follows:
+# manipulate snapshots of the machine as requested.
 #
-# ansible_snap_$(date +%F)
+# Supported actions are:
 #
-# The script will normally prompt for a hostgroup and an action, it can also be
+# * Create snapshots (automatically with a datestamp, or with a provided name)
+# * Delete given or all snapshots
+# * Revert to a given snapshot, this script will NOT give you a list to pick from.
+#
+# The script will normally prompt for the required information, it can also be
 # provided using the following commandline:
 #
+# ```
 # ansible-playbook playbooks/vm-snapshots.yml --extra-vars="target_group=prod, target_action=present"
+# ```
 #
 # Which will create snapshots for all machines in the 'prod' hostgroup.
 #
-# NOTE: This playbook does not support reverting snapshots at this time!
+# Required variables:
+#
+# * target_group: a comma-separated list of hostgroups that are targeted
+# * target_action: one of the actions in the supported_actions list
+#
+# Optional variables:
+#
+# * snapshot_name:
+#   o When creating snapshots: override the name of the snapshot
+#   o When reverting/deleting snapshots: the target snapshot to delete
 #
 - hosts: localhost
   gather_facts: no
+
+  vars:
+    supported_actions: [present,absent,remove_all,revert]
+    info_actions: [absent,revert]
 
   vars_prompt:
     - name: target_group
       prompt: "What is the Ansible hostgroup you want to snapshot? (group1,group2)"
       private: no
     - name: target_action
-      prompt: "Specify the action to take: [present,absent,remove_all]"
+      prompt: "Specify the action to take: {{ supported_actions }}"
       private: no
       default: "present"
 
   tasks:
-  - block:
-    - name: "Gather current date"
-      setup:
+  - name: "Check if action is allowed"
+    fail:
+      msg: "Invalid/unsuppored action!"
+    when: target_action not in supported_actions
+
+  - name: "Get extra information"
+    pause:
+      prompt: "Which snapshot should be removed/reverted to?"
+    register: snapshot_name
+    when: target_action in info_actions and snapshot_name is undefined
+
+  - name: "Set snapshot name"
+    block:
+    - setup:
         filter: ansible_date_time
-    - name: "Locate VM in vSphere"
-      vmware_guest_find:
-        hostname: "{{ vsphere_host }}"
-        username: "{{ vsphere_username }}"
-        password: "{{ vsphere_password }}"
-        validate_certs: "{{ vsphere_validate_certs }}"
-        name: "{{ item }}"
-      delegate_to: "{{ vpshere_api_host }}"
-      register: vm_location
-      loop: "{{ query('inventory_hostnames', '{{ target_group }}' ) }}"
-    - name: "Execute snapshot action"
-      vmware_guest_snapshot:
-        hostname: "{{ vsphere_host }}"
-        username: "{{ vsphere_username }}"
-        password: "{{ vsphere_password }}"
-        datacenter: "{{ item.folders[0].split('/')[1] }}"
-        folder: "{{ item.folders[0] }}"
-        name: "{{ item.item }}"
-        validate_certs: "{{ vsphere_validate_certs }}"
-        state: "{{ target_action }}"
+    - set_fact:
         snapshot_name: "ansible_snap_{{ ansible_date_time.date }}"
-      delegate_to: "{{ vpshere_api_host }}"
-      with_items: "{{ vm_location['results'] }}"
+    when: target_action == "present"
+
+  - name: "Locate VM in vSphere"
+    vmware_guest_find:
+      hostname: "{{ vsphere_host }}"
+      username: "{{ vsphere_username }}"
+      password: "{{ vsphere_password }}"
+      validate_certs: "{{ vsphere_validate_certs }}"
+      name: "{{ item }}"
+    delegate_to: "{{ vpshere_api_host }}"
+    register: vm_location
+    loop: "{{ query('inventory_hostnames', '{{ target_group }}' ) }}"
+
+  - name: "Execute snapshot action"
+    vmware_guest_snapshot:
+      hostname: "{{ vsphere_host }}"
+      username: "{{ vsphere_username }}"
+      password: "{{ vsphere_password }}"
+      datacenter: "{{ item.folders[0].split('/')[1] }}"
+      folder: "{{ item.folders[0] }}"
+      name: "{{ item.item }}"
+      validate_certs: "{{ vsphere_validate_certs }}"
+      state: "{{ target_action }}"
+      snapshot_name: "{{ snapshot_name.user_input | default( snapshot_name ) }}"
+    delegate_to: "{{ vpshere_api_host }}"
+    with_items: "{{ vm_location['results'] }}"
