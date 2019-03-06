@@ -2,7 +2,7 @@
 [sssd]
 config_file_version = 2
 services = nss, pam
-domains = {{ adjoin_domain_name }} {% if adjoin_mgmt_enabled %} {{ adjoin_mgmt_domain_name }} {% endif %}
+domains = {{ adjoin_domain_name }} {% if adjoin_mgmt_enabled %}, {{ adjoin_mgmt_domain_name }} {% endif %}
 
 debug_level = 3
 
@@ -16,8 +16,8 @@ id_provider = ad
 krb5_realm = {{ adjoin_domain_name|upper }}
 ldap_id_mapping = True
 ignore_group_members = True
-fallback_homedir = /home/%u
-default_shell = /bin/bash
+fallback_homedir = {{ adjoin_sssd_homedir }}
+default_shell = {{ adjoin_sssd_default_shell }}
 dyndns_update = false
 dns_resolver_timeout = 12
 debug_level = 3
@@ -29,8 +29,8 @@ id_provider = ad
 krb5_realm = {{ adjoin_mgmt_domain_name|upper }}
 ldap_id_mapping = True
 ignore_group_members = True
-fallback_homedir = /home/%u
-default_shell = /bin/bash
+fallback_homedir = {{ adjoin_sssd_homedir }}
+default_shell = {{ adjoin_sssd_default_shell }}
 dyndns_update = false
 dns_resolver_timeout = 12
 debug_level = 3

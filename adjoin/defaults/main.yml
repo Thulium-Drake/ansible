@@ -1,4 +1,8 @@
 ---
+# Common settings for all domains
+adjoin_sssd_homedir: '/home/%u'
+adjoin_sssd_default_shell: '/bin/bash'
+
 # Information of the primary AD domain to join
 adjoin_domain_name: 'prod.example.com'
 adjoin_workgroup_name: 'PROD'

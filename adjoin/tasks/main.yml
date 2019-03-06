@@ -6,6 +6,7 @@
       'ldap-utils',
       'krb5-user',
       'samba-common',
+      'sudo',
       'sssd-ad'
       ]
     state: present
@@ -17,6 +18,7 @@
       'openldap-clients',
       'krb5-workstation',
       'sssd',
+      'sudo',
       'samba-winbind-clients',
       'oddjob-mkhomedir'
       ]
