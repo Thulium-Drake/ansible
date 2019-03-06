@@ -6,7 +6,7 @@
   admin_server = FILE:/var/log/kadmind.log
 
 [libdefaults]
-  permitted_enctypes = arcfour-hmac-md5 aes256-cts
+  permitted_enctypes = {{ adjoin_kerberos_enctypes }}
   default_realm = {% if adjoin_mgmt_enabled %} {{ adjoin_mgmt_domain_name|upper }} {% else %} {{ adjoin_domain_name|upper }} {% endif %}
 
   dns_lookup_realm = true
@@ -14,10 +14,8 @@
   ticket_lifetime = 24h
   renew_lifetime = 7d
   forwardable = true
-  default_etypes = arcfour-hmac-md5
-  default_etypes_des = des-cbc-crc
-  default_tkt_enctypes = arcfour-hmac-md5
-  default_tgs_enctypes = arcfour-hmac-md5
+  default_tkt_enctypes = {{ adjoin_kerberos_enctypes }}
+  default_tgs_enctypes = {{ adjoin_kerberos_enctypes }}
 
 [realms]
   {{ adjoin_domain_name|upper }} = {

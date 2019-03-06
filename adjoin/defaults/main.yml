@@ -2,6 +2,9 @@
 # Common settings for all domains
 adjoin_sssd_homedir: '/home/%u'
 adjoin_sssd_default_shell: '/bin/bash'
+# Please note that disabling arcfour-hmac-md5 can NOT be done without some
+# work on the AD controller's side
+adjoin_kerberos_enctypes: 'aes256-cts arcfour-hmac-md5'
 
 # Information of the primary AD domain to join
 adjoin_domain_name: 'prod.example.com'
@@ -18,7 +21,8 @@ adjoin_computer_objects_path: 'SomeOU/Computers'
 adjoin_linux_admins: 'Linux Domain Admins'
 
 adjoin_service_username: 'administrator'
-# Please take adequate measures to protect this userpassword! For example, use ansible-vault or passwordstore
+# Please take adequate measures to protect this userpassword! For example,
+# use ansible-vault or passwordstore
 #
 # Please do make it more secure then this example! :-)
 adjoin_service_userpassword: 'Password1!'
