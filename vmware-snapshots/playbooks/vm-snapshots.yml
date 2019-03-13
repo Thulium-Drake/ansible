@@ -67,25 +67,25 @@
 
   - name: "Locate VM in vSphere"
     vmware_guest_find:
-      hostname: "{{ vsphere_host }}"
-      username: "{{ vsphere_username }}"
-      password: "{{ vsphere_password }}"
+      hostname: "{{ hostvars[item]['vsphere_host'] }}"
+      username: "{{ hostvars[item]['vsphere_username'] }}"
+      password: "{{ hostvars[item]['vsphere_password'] }}"
       validate_certs: "{{ vsphere_validate_certs }}"
       name: "{{ item }}"
-    delegate_to: "{{ vpshere_api_host }}"
+    delegate_to: "{{ hostvars[item]['vpshere_api_host'] }}"
     register: vm_location
     loop: "{{ query('inventory_hostnames', '{{ target_group }}' ) }}"
 
   - name: "Execute snapshot action"
     vmware_guest_snapshot:
-      hostname: "{{ vsphere_host }}"
-      username: "{{ vsphere_username }}"
-      password: "{{ vsphere_password }}"
+      hostname: "{{ hostvars[item.item]['vsphere_host'] }}"
+      username: "{{ hostvars[item.item]['vsphere_username'] }}"
+      password: "{{ hostvars[item.item]['vsphere_password'] }}"
       datacenter: "{{ item.folders[0].split('/')[1] }}"
       folder: "{{ item.folders[0] }}"
       name: "{{ item.item }}"
       validate_certs: "{{ vsphere_validate_certs }}"
       state: "{{ target_action }}"
       snapshot_name: "{{ snapshot_name.user_input | default( snapshot_name ) }}"
-    delegate_to: "{{ vpshere_api_host }}"
+    delegate_to: "{{ hostvars[item.item]['vpshere_api_host'] }}"
     with_items: "{{ vm_location['results'] }}"

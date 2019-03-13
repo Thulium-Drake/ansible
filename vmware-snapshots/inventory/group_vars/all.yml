@@ -1,5 +1,4 @@
 ---
-
 # Connection information for vSphere
 vpshere_api_host: 'localhost'                     # The host that has pyVmomi installed
 vsphere_host: 'vcenter.dom1.carrier'              # Your vCenter machine
