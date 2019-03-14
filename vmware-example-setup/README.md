@@ -1,8 +1,8 @@
-# Ansible VMWare playbooks
-This set of playbooks will use the VMWare SDK to interact with a vCenter host:
+# Ansible VMWare example setup
+This folder contains an example on how to use Ansible with VMWare. It provides:
 
-* Retrieve inventory of VMs
-* Create/Delete snapshots of VMs
+* VMWare inventory configuration
+* Create/Delete snapshots of VMs in an example playbook that uses the [VMWare](../vmware) role.
 
 I found that the VMWare inventory itself isn't particularly usefull as it does not take in account any folders or groups in vCenter. However, I've added it so you can see how it should be configured. :-)
 

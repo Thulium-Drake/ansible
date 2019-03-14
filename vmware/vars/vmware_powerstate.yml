@@ -1,0 +1,4 @@
+---
+# Variables file for the VMWare powerstate tasks
+#
+supported_actions: [powered-off,powered-on,reboot-guest,restarted,shutdown-guest,suspended,present]

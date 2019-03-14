@@ -1,0 +1,5 @@
+---
+# Variables file for the VMWare snapshot tasks
+#
+supported_actions: [present,absent,remove_all,revert]
+info_actions: [absent,revert]

@@ -1,0 +1,11 @@
+---
+- name: "Locate VM in vSphere"
+  vmware_guest_find:
+    hostname: "{{ hostvars[item]['vsphere_host'] }}"
+    username: "{{ hostvars[item]['vsphere_username'] }}"
+    password: "{{ hostvars[item]['vsphere_password'] }}"
+    validate_certs: "{{ vsphere_validate_certs }}"
+    name: "{{ item }}"
+  delegate_to: "{{ hostvars[item]['vpshere_api_host'] }}"
+  register: vm_location
+  loop: "{{ query('inventory_hostnames', '{{ target_group }}' ) }}"
