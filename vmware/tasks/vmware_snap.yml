@@ -1,57 +1,7 @@
 ---
-# This role will manage snapshots of all VMs in a specific hostgroup
-# or set of groups. It will resolve the path of the VM inside vCenter and
-# manipulate snapshots of the machine as requested.
+# This role will manage snapshots of all targeted VMs.
 #
-# Supported actions are:
-#
-# * Create snapshots (automatically with a datestamp, or with a provided name)
-# * Delete given or all snapshots
-# * Revert to a given snapshot, this script will NOT give you a list to pick from.
-#
-# The role will NOT prompt for the required information, it can only be
-# provided using the playbook used to call it:
-#
-# ```
-# - hosts: all
-#   gather_facts: no
-#   tasks:
-#   - set_fact:
-#       target_action: "present"
-#       target_group: "{{ ansible_limit }}"
-#     delegate_to: localhost
-#
-#   - import_role:
-#       name: vmware
-#       tasks_from: vmware_snap.yml
-#     delegate_to: localhost
-#     run_once: yes
-# ```
-#
-# Required variables:
-#
-# * target_group: a comma-separated list of hostgroups that are targeted
-# * target_action: one of the actions in the supported_actions list
-#
-# Optional variables:
-#
-# * snapshot_name:
-#   o When creating snapshots: override the name of the snapshot
-#   o When reverting/deleting snapshots: the target snapshot to delete
-#
-- include_vars: vmware_snap.yml
-
-- name: "Check for complete input, skip is OK"
-  fail:
-    msg: "Missing information"
-  when: target_action is not defined or target_group is not defined
-
-- name: "Check if action is allowed, skip is OK"
-  fail:
-    msg: "Invalid/unsuppored action!"
-  when: target_action not in supported_actions
-
-- name: "Set snapshot name"
+- name: Set snapshot name
   block:
   - setup:
       filter: ansible_date_time
@@ -59,9 +9,7 @@
       snapshot_name: "ansible_snap_{{ ansible_date_time.date }}"
   when: target_action == "present"
 
-- import_tasks: vmware_find.yml
-
-- name: "Execute snapshot action"
+- name: Execute snapshot action
   vmware_guest_snapshot:
     hostname: "{{ hostvars[item.item]['vsphere_host'] }}"
     username: "{{ hostvars[item.item]['vsphere_username'] }}"
@@ -70,7 +18,7 @@
     folder: "{{ item.folders[0] }}"
     name: "{{ item.item }}"
     validate_certs: "{{ vsphere_validate_certs }}"
-    state: "{{ target_action }}"
+    state: "{{ target_state }}"
     snapshot_name: "{{ snapshot_name.user_input | default( snapshot_name ) }}"
   delegate_to: "{{ hostvars[item.item]['vpshere_api_host'] }}"
   with_items: "{{ vm_location['results'] }}"

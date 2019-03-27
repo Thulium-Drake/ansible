@@ -6,13 +6,13 @@
 - hosts: all
   gather_facts: no
   tasks:
-    - name: "Configure VMWare role"
+    - name: Configure VMWare role
       set_fact:
-        target_action: "present"
+        target_action: snap
         target_group: "{{ ansible_limit }}"
+        target_state: present
       delegate_to: localhost
     - import_role:
         name: vmware
-        tasks_from: vmware_snap.yml
       delegate_to: localhost
       run_once: yes

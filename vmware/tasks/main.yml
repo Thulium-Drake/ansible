@@ -1,0 +1,22 @@
+---
+# This playbook will run all common tasks for the VMware role before running
+# the desired action.
+- name: Load {{ target_action }} variables
+  include_vars:
+    file: "vmware_{{ target_action }}.yml"
+
+- name: Check for complete input, skip is OK
+  fail:
+    msg: Missing information
+  when: target_state is not defined or target_group is not defined
+
+- name: Check if state is allowed, skip is OK
+  fail:
+    msg: Invalid/unsuppored action!
+  when: target_state not in supported_states
+
+- name: Locate VM in vSphere
+  import_tasks: vmware_find.yml
+
+- name: Run {{ target_action }} playbook
+  include_tasks: "vmware_{{ target_action }}.yml"

@@ -1,4 +1,6 @@
 ---
+# This playbook is used to locate VMs inside a vSphere datacenter, on which
+# then actions can be run.
 - name: "Locate VM in vSphere"
   vmware_guest_find:
     hostname: "{{ hostvars[item]['vsphere_host'] }}"

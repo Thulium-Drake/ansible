@@ -1,51 +1,7 @@
 ---
-# This role will manage the powerstate of all VMs in a specific hostgroup
-# or set of groups. It will resolve the path of the VM inside vCenter and
-# manipulate the powerstate of the machine as requested.
+# This playbook will manage the powerstate of all targeted VMs
 #
-# Supported actions are:
-#
-# * Poweron a VM using either VMWare tools or the virtual power button
-#
-# The role will NOT prompt for the required information, it can only be
-# provided using the playbook used to call it:
-#
-# ```
-# - hosts: all
-#   gather_facts: no
-#   tasks:
-#   - set_fact:
-#       target_action: "shutdownguest"
-#       target_group: "{{ ansible_limit }}"
-#     delegate_to: localhost
-#
-#   - import_role:
-#       name: vmware
-#       tasks_from: vmware_powerstate.yml
-#     delegate_to: localhost
-#     run_once: yes
-# ```
-#
-# Required variables:
-#
-# * target_group: a comma-separated list of hostgroups that are targeted
-# * target_action: one of the actions in the supported_powerstates list
-#
-- include_vars: vmware_powerstate.yml
-
-- name: "Check for complete input, skip is OK"
-  fail:
-    msg: "Missing information"
-  when: target_action is not defined or target_group is not defined
-
-- name: "Check if action is allowed, skip is OK"
-  fail:
-    msg: "Invalid/unsuppored action!"
-  when: target_action not in supported_actions
-
-- import_tasks: vmware_find.yml
-
-- name: "Execute powerstate action"
+- name: Set VM powerstate
   vmware_guest_powerstate:
     hostname: "{{ hostvars[item.item]['vsphere_host'] }}"
     username: "{{ hostvars[item.item]['vsphere_username'] }}"
@@ -53,7 +9,7 @@
     folder: "{{ item.folders[0] }}"
     name: "{{ item.item }}"
     validate_certs: "{{ vsphere_validate_certs }}"
-    state: "{{ target_action }}"
+    state: "{{ target_state }}"
     state_change_timeout: "{{ vmware_powerstate_wait }}"
   delegate_to: "{{ hostvars[item.item]['vpshere_api_host'] }}"
   with_items: "{{ vm_location['results'] }}"
