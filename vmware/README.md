@@ -105,6 +105,6 @@ provided using the playbook used to call it:
 ### Optional variables:
 
  * target_snapshot_name:
-   o When creating snapshots: override the name of the snapshot
-   o When reverting/deleting snapshots: the target snapshot to delete
+   * When creating snapshots: override the name of the snapshot
+   * When reverting/deleting snapshots: the target snapshot to delete
 
