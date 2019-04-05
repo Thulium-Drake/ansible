@@ -2,17 +2,15 @@
 # This example playbook will make snapshots of all the VMs that are included in the 'ansible_limit'
 #
 # The way this playbook is constructed allows for easy integration with existing playbooks,
-# the tasks below are the only 2 required to make this role do it's work.
+# the task below is the only one required to make this role do it's work.
 - hosts: all
   gather_facts: no
   tasks:
-    - name: Configure VMWare role
-      set_fact:
+    - import_role:
+        name: vmware
+      vars:
         target_action: snap
         target_group: "{{ ansible_limit }}"
         target_state: present
-      delegate_to: localhost
-    - import_role:
-        name: vmware
-      delegate_to: localhost
+        target_snapshot_name: ansible_snap_stuff # Remove this value to generate snapshot names with the current date
       run_once: yes

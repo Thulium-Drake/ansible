@@ -1,6 +1,26 @@
 ---
 # This playbook will run all common tasks for the VMware role before running
 # the desired action.
+- name: Check dependencies
+  python_requirements_facts:
+    dependencies:
+      - 'pyvmomi'
+      - 'suds'
+      - 'vapi_client_bindings'
+      - 'vmc_client_bindings'
+      - 'nsx_python_sdk'
+      - 'nsx_policy_python_sdk'
+      - 'vmc_app_python_sdk'
+  register: vmware_deps
+  delegate_to: "{{ hostvars[item]['vpshere_api_host'] }}"
+  loop: "{{ query('inventory_hostnames', '{{ target_group }}' ) }}"
+
+- name: Install dependencies
+  include_tasks: vmware_install.yml
+  when: item.not_found | length
+  delegate_to: "{{ hostvars[item.item]['vpshere_api_host'] }}"
+  loop: "{{ vmware_deps['results'] }}"
+
 - name: Load {{ target_action }} variables
   include_vars:
     file: "vmware_{{ target_action }}.yml"
