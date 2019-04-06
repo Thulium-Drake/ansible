@@ -9,8 +9,8 @@ I found that the VMWare inventory itself isn't particularly usefull as it does n
 ## Lab environment
 For my setup I have used the following:
 
-* KVM with ESXi installed: esxi.dom1.carrier
-* VM on the ESXi with vCenter appliance: vcenter.dom1.carrier
+* KVM with ESXi installed: esxi.dom1.lab
+* VM on the ESXi with vCenter appliance: vcenter.dom1.lab
 * DNS server with both names so they will properly resolve
 
 Get your vCenter trial licenses here: https://www.vmware.com/nl/try-vmware.html
