@@ -1,0 +1,38 @@
+- name: 'Install Molecule'
+  hosts: 'all'
+  tasks:
+    - name: 'Install docker deps'
+      apt:
+        name:
+          - 'apt-transport-https'
+          - 'ca-certificates'
+          - 'curl'
+          - 'gnupg2'
+          - 'software-properties-common'
+        state: 'present'
+        update_cache: yes
+
+    - name: 'Get docker repo key'
+      apt_key:
+        id: '9DC858229FC7DD38854AE2D88D81803C0EBFCD88'
+        url: 'https://download.docker.com/linux/debian/gpg'
+
+    - name: 'Set docker repo'
+      apt_repository:
+        repo: "deb https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable"
+        filename: 'docker'
+
+    - name: 'Install docker and pip'
+      apt:
+        name:
+          - 'docker-ce'
+          - 'docker-ce-cli'
+          - 'containerd.io'
+          - 'python-pip'
+
+    - name: 'Install molecule and docker-py'
+      pip:
+        name:
+          - 'docker-py'
+          - 'molecule'
+        state: 'present'

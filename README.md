@@ -7,5 +7,6 @@ Check them out at https://galaxy.ansible.com/thulium_drake
 
 # Example setups and other stuff
 * [vmware-example-setup](vmware-example-setup/): Ansible environment for use with VMWare, for use a guide to setup.
+* [molecule-setup](molecule-setup/): Ansible environment to setup Molecule on a system
 
 Have fun!
