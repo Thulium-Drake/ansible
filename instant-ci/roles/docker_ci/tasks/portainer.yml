@@ -1,0 +1,54 @@
+---
+# Deploy Portainer and Portainer agent to the Docker Swarm
+- name: 'Create network'
+  docker_network:
+    name: 'portainer_agent_network'
+    driver: 'overlay'
+
+- name: 'Create directory for container data'
+  file:
+    path: "{{ gluster_mount_dir }}/portainer_data"
+    state: 'directory'
+
+- name: 'Deploy Portainer'
+  docker_swarm_service:
+    name: 'portainer'
+    image: 'portainer/portainer'
+    mounts:
+      - source: "{{ gluster_mount_dir }}/portainer_data"
+        target: '/data'
+        type: 'bind'
+    networks:
+      - 'traefik_network'
+      - 'portainer_agent_network'
+    labels:
+      traefik.backend.loadbalancer.sticky: 'true'
+      traefik.port: '9000'
+      traefik.network: 'traefik_network'
+    mode: 'replicated'
+    replicas: 1
+    restart_policy: 'any'
+    constraints:
+      - 'node.role == manager'
+    user: null
+
+- name: 'Deploy Portainer Agent'
+  docker_swarm_service:
+    name: 'portainer_agent'
+    image: 'portainer/agent'
+    env:
+      - 'AGENT_CLUSTER_ADDR=tasks.portainer_agent'
+    mounts:
+      - source: '/var/run/docker.sock'
+        target: '/var/run/docker.sock'
+        type: 'bind'
+      - source: '/var/lib/docker/volumes'
+        target: '/var/lib/docker/volumes'
+        type: 'bind'
+    networks:
+      - 'portainer_agent_network'
+    mode: 'global'
+    restart_policy: 'any'
+    constraints:
+      - 'node.platform.os == linux'
+    user: null

@@ -1,0 +1,30 @@
+---
+- name: 'Ensure Gluster brick and mount directories exist'
+  file:
+    path: "{{ dir }}"
+    state: 'directory'
+    mode: 0775
+  loop:
+    - "{{ gluster_brick_dir }}"
+    - "{{ gluster_mount_dir }}"
+  loop_control:
+    loop_var: 'dir'
+
+- name: 'Configure Gluster volume'
+  gluster_volume:
+    state: 'present'
+    name: "{{ gluster_brick_name }}"
+    brick: "{{ gluster_brick_dir }}"
+    replicas: "{{ groups.all | length }}"
+    cluster: "{{ groups.all | join(',') }}"
+    host: "{{ inventory_hostname }}"
+    force: True
+  run_once: True
+
+- name: 'Ensure Gluster volume is mounted'
+  mount:
+    name: "{{ gluster_mount_dir }}"
+    src: "{{ inventory_hostname }}:/{{ gluster_brick_name }}"
+    fstype: 'glusterfs'
+    opts: "defaults,_netdev"
+    state: 'mounted'

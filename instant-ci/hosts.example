@@ -1,0 +1,6 @@
+[master]
+dockmaster.example.com
+
+[workers]
+dockworker-1.example.com
+dockworker-2.example.com

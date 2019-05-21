@@ -1,1 +1,3 @@
 *.swp
+hosts
+instant-ci/galaxy_roles

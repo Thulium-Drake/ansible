@@ -1,0 +1,36 @@
+---
+# Deploy Traefik
+- name: 'Create network'
+  docker_network:
+    name: 'traefik_network'
+    driver: 'overlay'
+
+- name: 'Deploy Traefik'
+  docker_swarm_service:
+    name: 'traefik'
+    image: 'traefik'
+    args:
+      - 'traefik'
+      - '--docker'
+      - '--docker.swarmMode'
+      - "--docker.domain={{ traefik_domain }}"
+      - '--docker.watch'
+      - '--api'
+    mounts:
+      - source: '/var/run/docker.sock'
+        target: '/var/run/docker.sock'
+        type: 'bind'
+    networks:
+      - 'traefik_network'
+    mode: 'global'
+    restart_policy: 'any'
+    publish:
+      - published_port: 80
+        target_port: 80
+      - published_port: 443
+        target_port: 443
+      - published_port: 8080
+        target_port: 8080
+    constraints:
+      - 'node.role == manager'
+    user: null

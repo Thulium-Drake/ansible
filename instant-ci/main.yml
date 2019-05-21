@@ -1,0 +1,11 @@
+---
+- hosts: 'all'
+  roles:
+#    - 'pip'
+#    - 'docker'
+#    - 'glusterfs'
+    - 'gluster_volume'
+
+- hosts: 'master'
+  roles:
+    - 'docker_ci'

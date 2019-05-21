@@ -1,0 +1,7 @@
+---
+- name: 'docker'
+  src: 'geerlingguy.docker'
+- name: 'pip'
+  src: 'geerlingguy.pip'
+- name: 'glusterfs'
+  src: 'geerlingguy.glusterfs'

@@ -1,0 +1,17 @@
+# Docker settings
+docker_edition: 'ce'
+docker_package: "docker-{{ docker_edition }}"
+docker_package_state: present
+
+# Pip packages required
+pip_install_packages:
+  - name: docker
+
+# Gluster paths/settings
+glusterfs_daemon: 'glusterfs-server'
+gluster_brick_dir: "/exports/gluster/{{ inventory_hostname }}"
+gluster_mount_dir: '/data/docker/volumes'
+gluster_brick_name: 'docker_volumes'
+
+# Traefik settings
+traefik_domain: 'dckr.zm1.element-networks.nl'
