@@ -21,13 +21,6 @@
   loop_control:
     loop_var: 'worker'
 
-- debug:
-    msg: "{{ hostvars[worker]['ansible_default_ipv4']['address'] }}"
-  delegate_to: "{{ worker }}"
-  loop: "{{ query('inventory_hostnames', 'workers') }}"
-  loop_control:
-    loop_var: 'worker'
-
 - name: 'Join workers to Swarm'
   docker_swarm:
     state: 'join'
