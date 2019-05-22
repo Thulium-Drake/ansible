@@ -1,5 +1,4 @@
 ---
-# Deploy Traefik
 - name: 'Create network'
   docker_network:
     name: 'traefik_network'

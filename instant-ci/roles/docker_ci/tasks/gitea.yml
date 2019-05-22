@@ -1,0 +1,31 @@
+---
+- name: 'Create network'
+  docker_network:
+    name: 'gitea_network'
+    driver: 'overlay'
+
+- name: 'Create directory for container data'
+  file:
+    path: "{{ gluster_mount_dir }}/gitea_data"
+    state: 'directory'
+
+- name: 'Deploy Gitea'
+  docker_swarm_service:
+    name: 'gitea'
+    image: 'gitea/gitea'
+    env:
+      - 'DB_HOST=tasks.mariadb'
+      - 'DB_NAME=gitea'
+      - 'DB_USER=gitea'
+      - "DB_PASSWORD={{ gitea_db_password }}"
+      - 'RUN_MODE=prod'
+    mounts:
+      - source: "{{ gluster_mount_dir }}/mariadb_data"
+        target: '/var/lib/mysql'
+        type: 'bind'
+    networks:
+      - 'mariadb_network'
+    mode: 'replicated'
+    replicas: 1
+    restart_policy: 'any'
+    user: null

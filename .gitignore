@@ -1,3 +1,4 @@
 *.swp
 hosts
 instant-ci/galaxy_roles
+instant-ci/ansible-vault
