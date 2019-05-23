@@ -1,7 +1,7 @@
 ---
 - name: 'Create network'
   docker_network:
-    name: 'traefik_network'
+    name: 'traefik_backend'
     driver: 'overlay'
 
 - name: 'Deploy Traefik'
@@ -20,9 +20,10 @@
         target: '/var/run/docker.sock'
         type: 'bind'
     networks:
-      - 'traefik_network'
+      - 'traefik_backend'
     mode: 'global'
-    restart_policy: 'any'
+    restart_config:
+      condition: 'any'
     publish:
       - published_port: 80
         target_port: 80
@@ -30,6 +31,7 @@
         target_port: 443
       - published_port: 8080
         target_port: 8080
-    constraints:
-      - 'node.role == manager'
+    placement:
+      constraints:
+        - 'node.role == manager'
     user: null

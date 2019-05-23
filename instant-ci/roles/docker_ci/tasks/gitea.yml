@@ -1,31 +1,67 @@
 ---
 - name: 'Create network'
   docker_network:
-    name: 'gitea_network'
+    name: 'gitea_backend'
     driver: 'overlay'
 
 - name: 'Create directory for container data'
   file:
-    path: "{{ gluster_mount_dir }}/gitea_data"
+    path: "{{ gluster_mount_dir }}/{{ dir }}"
     state: 'directory'
+  loop:
+    - 'gitea_data'
+    - 'gitea_db'
+  loop_control:
+    loop_var: 'dir'
 
-- name: 'Deploy Gitea'
+- name: 'Deploy MariaDB for Gitea'
   docker_swarm_service:
-    name: 'gitea'
-    image: 'gitea/gitea'
+    name: 'gitea_mariadb'
+    image: 'mariadb'
     env:
-      - 'DB_HOST=tasks.mariadb'
-      - 'DB_NAME=gitea'
-      - 'DB_USER=gitea'
-      - "DB_PASSWORD={{ gitea_db_password }}"
-      - 'RUN_MODE=prod'
+      - "MYSQL_ROOT_PASSWORD={{ mariadb_root_password }}"
+      - 'MYSQL_DATABASE=gitea'
+      - 'MYSQL_USER=gitea'
+      - "MYSQL_PASSWORD={{ gitea_db_password }}"
     mounts:
-      - source: "{{ gluster_mount_dir }}/mariadb_data"
+      - source: "{{ gluster_mount_dir }}/gitea_db"
         target: '/var/lib/mysql'
         type: 'bind'
     networks:
-      - 'mariadb_network'
+      - 'gitea_backend'
     mode: 'replicated'
     replicas: 1
-    restart_policy: 'any'
+    restart_config:
+      condition: 'any'
+    user: null
+
+- name: 'Deploy Gitea'
+  docker_swarm_service:
+    name: 'git'
+    image: 'gitea/gitea'
+    env:
+      - 'DB_TYPE=mysql'
+      - 'DB_HOST=tasks.gitea_mariadb'
+      - 'DB_NAME=gitea'
+      - 'DB_USER=gitea'
+      - "DB_PASSWD={{ gitea_db_password }}"
+      - 'RUN_MODE=prod'
+      - "ROOT_URL=http://git.{{ traefik_domain }}"
+    mounts:
+      - source: "{{ gluster_mount_dir }}/gitea_data"
+        target: '/data'
+        type: 'bind'
+    networks:
+      - 'gitea_backend'
+      - 'traefik_backend'
+    publish:
+      - published_port: 2222
+        target_port: 22
+    labels:
+      traefik.port: '3000'
+      traefik.docker.network: 'traefik_backend'
+    mode: 'replicated'
+    replicas: 1
+    restart_config:
+      condition: 'any'
     user: null

@@ -1,0 +1,91 @@
+---
+- name: 'Create network'
+  docker_network:
+    name: 'drone_backend'
+    driver: 'overlay'
+
+- name: 'Create directory for container data'
+  file:
+    path: "{{ gluster_mount_dir }}/{{ dir }}"
+    state: 'directory'
+  loop:
+    - 'drone_data'
+    - 'drone_db'
+  loop_control:
+    loop_var: 'dir'
+
+- name: 'Deploy MariaDB for Drone'
+  docker_swarm_service:
+    name: 'drone_mariadb'
+    image: 'mariadb'
+    env:
+      - "MYSQL_ROOT_PASSWORD={{ mariadb_root_password }}"
+      - 'MYSQL_DATABASE=drone'
+      - 'MYSQL_USER=drone'
+      - "MYSQL_PASSWORD={{ drone_db_password }}"
+    mounts:
+      - source: "{{ gluster_mount_dir }}/drone_db"
+        target: '/var/lib/mysql'
+        type: 'bind'
+    networks:
+      - 'drone_backend'
+    mode: 'replicated'
+    replicas: 1
+    restart_config:
+      condition: 'any'
+    user: null
+
+- name: 'Deploy Drone'
+  docker_swarm_service:
+    name: 'drone'
+    image: 'drone/drone'
+    env:
+      - 'DRONE_ADMIN=root'
+      - 'DRONE_ADMIN_ALL=true'
+      - 'DRONE_DATABASE_DRIVER=mysql'
+      - "DRONE_DATABASE_DATASOURCE=drone:{{ drone_db_password}}@tcp(tasks.drone_mariadb:3306)/drone?parseTime=true"
+      - 'DRONE_GITEA_SERVER=http://tasks.git:3000'
+      - 'DRONE_GIT_ALWAYS_AUTH=true'
+      - "DRONE_RUNNER_CAPACITY={{ drone_runner_cap }}"
+      - 'DRONE_SERVER_PROTO=http'
+      - "DRONE_SERVER_HOST=drone.{{ traefik_domain }}"
+      - "DRONE_RPC_SECRET={{ drone_agent_rpc_secret }}"
+      - 'DRONE_AGENTS_ENABLED=true'
+    mounts:
+      - source: '/var/run/docker.sock'
+        target: '/var/run/docker.sock'
+        type: 'bind'
+      - source: "{{ gluster_mount_dir}}/drone_data"
+        target: '/data'
+        type: 'bind'
+    networks:
+      - 'drone_backend'
+      - 'gitea_backend'
+      - 'traefik_backend'
+    labels:
+      traefik.backend.loadbalancer.sticky: 'true'
+      traefik.docker.network: 'traefik_backend'
+      traefik.port: '80'
+    mode: 'replicated'
+    restart_config:
+      condition: 'any'
+    user: null
+
+- name: 'Deploy Drone agents'
+  docker_swarm_service:
+    name: 'drone_agent'
+    image: 'drone/agent'
+    env:
+      - "DRONE_RUNNER_CAPACITY={{ drone_runner_cap }}"
+      - "DRONE_RPC_HOST=drone.{{ traefik_domain }}"
+      - "DRONE_RPC_SECRET={{ drone_agent_rpc_secret }}"
+    networks:
+      - 'drone_backend'
+    mode: 'global'
+    mounts:
+      - source: '/var/run/docker.sock'
+        target: '/var/run/docker.sock'
+        type: 'bind'
+    restart_config:
+      condition: 'any'
+    user: null

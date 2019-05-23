@@ -25,15 +25,18 @@
     networks:
       - 'portainer_agent_network'
     mode: 'global'
-    restart_policy: 'any'
-    constraints:
-      - 'node.platform.os == linux'
+    restart_config:
+      condition: 'any'
+    placement:
+      constraints:
+        - 'node.platform.os == linux'
     user: null
 
 - name: 'Deploy Portainer'
   docker_swarm_service:
     name: 'portainer'
     image: 'portainer/portainer'
+    command: '/portainer -H tcp://tasks.portainer_agent:9001 --tlsskipverify'
     env:
       - 'AGENT_CLUSTER_ADDR=tasks.portainer_agent'
     mounts:
@@ -41,16 +44,18 @@
         target: '/data'
         type: 'bind'
     networks:
-      - 'traefik_network'
+      - 'traefik_backend'
       - 'portainer_agent_network'
     labels:
       traefik.backend.loadbalancer.sticky: 'true'
       traefik.port: '9000'
-      traefik.docker.network: 'traefik_network'
+      traefik.docker.network: 'traefik_backend'
     mode: 'replicated'
     replicas: 1
-    restart_policy: 'any'
-    constraints:
-      - 'node.role == manager'
+    restart_config:
+      condition: 'any'
+    placement:
+      constraints:
+        - 'node.role == manager'
     user: null
 

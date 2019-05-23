@@ -2,4 +2,5 @@
 containers:
   - 'traefik'
   - 'portainer'
-  - 'mariadb'
+  - 'gitea'
+  - 'drone'
