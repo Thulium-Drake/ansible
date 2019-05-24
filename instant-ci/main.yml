@@ -8,4 +8,4 @@
 
 - hosts: 'master'
   roles:
-    - 'docker_ci'
+    - 'docker_lab'

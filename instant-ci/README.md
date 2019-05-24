@@ -35,6 +35,8 @@ to add a container in the $APP_backend network with access to a disk and a MySQL
 # Setup
 In order to set this up, do the following:
 
+* Create a DNS wildcard record for a subdomain:
+ *.dckr.example.com
 * Create a couple of hosts (physical or virtual)
 * Make sure they have access to the Internet
 * Add them to the hosts file
@@ -50,12 +52,14 @@ ansible-playbook main.yml
 # Usage
 When Ansible is done with the setup, you should have access to the following URLs:
 
-* Portainer: https://portainer.example.com
-* Gitea: https://gitea.example.com
-* Drone: https://drone.example.com
+* Portainer: https://portainer.dckr.example.com
+* Gitea: https://gitea.example.dckr.com
+* Drone: https://drone.example.dckr.com
 
 In order to use these, you need to do the following things:
 
 * Create your administrative useraccounts for Portainer and Gitea
   * Drone will use the credentials you use for Gitea
 * Finish the setup of Gitea (just click Install), all information is already filled in!
+
+Gitea's SSH server is reachable on port 2222

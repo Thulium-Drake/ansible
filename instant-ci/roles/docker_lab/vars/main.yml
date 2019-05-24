@@ -1,0 +1,12 @@
+---
+containers:
+  - 'traefik'
+  - 'portainer'
+  - 'gitea'
+  - 'drone'
+
+docker_package: "docker-{{ docker_edition }}"
+docker_package_state: present
+
+pip_install_packages:
+  - name: 'docker'

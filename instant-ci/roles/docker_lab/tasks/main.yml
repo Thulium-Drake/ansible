@@ -7,4 +7,3 @@
   loop: "{{ containers }}"
   loop_control:
     loop_var: 'container'
-

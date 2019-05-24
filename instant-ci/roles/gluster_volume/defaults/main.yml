@@ -1,0 +1,6 @@
+---
+glusterfs_daemon: 'glusterfs-server'
+gluster_brick_dir: "/exports/gluster/{{ inventory_hostname }}"
+gluster_mount_dir: '/data/docker/volumes'
+gluster_volume_name: 'docker_volumes'
+

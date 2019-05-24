@@ -1,6 +1,0 @@
----
-containers:
-  - 'traefik'
-  - 'portainer'
-  - 'gitea'
-  - 'drone'

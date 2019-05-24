@@ -1,0 +1,17 @@
+---
+docker_edition: 'ce'
+
+traefik_domain: 'dckr.example.com'
+
+portainer_app_name: 'portainer'
+
+mariadb_root_password: 'StoreAllTheData!'
+
+gitea_app_name: 'gitea'
+gitea_db_password: 'GitRocksYourSocksOff'
+
+drone_app_name: 'drone'
+drone_db_password: 'NotSoSecretPassword'
+drone_runner_cap: 2
+drone_agent_rpc_secret: 'AllYourCompileJobsAreBelongToUs'
+
