@@ -13,7 +13,7 @@
 - name: 'Configure Gluster volume'
   gluster_volume:
     state: 'present'
-    name: "{{ gluster_brick_name }}"
+    name: "{{ gluster_volume_name }}"
     brick: "{{ gluster_brick_dir }}"
     replicas: "{{ groups.all | length }}"
     cluster: "{{ groups.all | join(',') }}"
@@ -24,7 +24,7 @@
 - name: 'Ensure Gluster volume is mounted'
   mount:
     name: "{{ gluster_mount_dir }}"
-    src: "{{ inventory_hostname }}:/{{ gluster_brick_name }}"
+    src: "{{ inventory_hostname }}:/{{ gluster_volume_name }}"
     fstype: 'glusterfs'
     opts: "defaults,_netdev"
     state: 'mounted'

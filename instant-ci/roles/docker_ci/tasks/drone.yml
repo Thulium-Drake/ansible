@@ -40,13 +40,12 @@
     name: 'drone'
     image: 'drone/drone'
     env:
-      - 'DRONE_ADMIN=root'
-      - 'DRONE_ADMIN_ALL=true'
+      - 'DRONE_USER_CREATE=username:root,admin:true'
       - 'DRONE_DATABASE_DRIVER=mysql'
       - "DRONE_DATABASE_DATASOURCE=drone:{{ drone_db_password}}@tcp(tasks.drone_mariadb:3306)/drone?parseTime=true"
-      - 'DRONE_GITEA_SERVER=http://tasks.git:3000'
+      - 'DRONE_GITEA_SERVER=http://tasks.gitea:3000'
       - 'DRONE_GIT_ALWAYS_AUTH=true'
-      - "DRONE_RUNNER_CAPACITY={{ drone_runner_cap }}"
+      - 'DRONE_RUNNER_CAPACITY=0'
       - 'DRONE_SERVER_PROTO=http'
       - "DRONE_SERVER_HOST=drone.{{ traefik_domain }}"
       - "DRONE_RPC_SECRET={{ drone_agent_rpc_secret }}"
@@ -66,6 +65,7 @@
       traefik.backend.loadbalancer.sticky: 'true'
       traefik.docker.network: 'traefik_backend'
       traefik.port: '80'
+      traefik.frontend.rule: "Host:{{ drone_app_name }}.{{ traefik_domain }}"
     mode: 'replicated'
     restart_config:
       condition: 'any'

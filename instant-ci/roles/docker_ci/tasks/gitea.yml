@@ -37,7 +37,7 @@
 
 - name: 'Deploy Gitea'
   docker_swarm_service:
-    name: 'git'
+    name: 'gitea'
     image: 'gitea/gitea'
     env:
       - 'DB_TYPE=mysql'
@@ -46,7 +46,7 @@
       - 'DB_USER=gitea'
       - "DB_PASSWD={{ gitea_db_password }}"
       - 'RUN_MODE=prod'
-      - "ROOT_URL=http://git.{{ traefik_domain }}"
+      - "ROOT_URL=https://{{ gitea_app_name }}.{{ traefik_domain }}"
     mounts:
       - source: "{{ gluster_mount_dir }}/gitea_data"
         target: '/data'
@@ -60,6 +60,7 @@
     labels:
       traefik.port: '3000'
       traefik.docker.network: 'traefik_backend'
+      traefik.frontend.rule: "Host:{{ gitea_app_name }}.{{ traefik_domain }}"
     mode: 'replicated'
     replicas: 1
     restart_config:

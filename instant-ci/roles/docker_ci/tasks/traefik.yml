@@ -4,20 +4,45 @@
     name: 'traefik_backend'
     driver: 'overlay'
 
+- name: 'Generate SSL key'
+  openssl_privatekey:
+    path: "{{ gluster_mount_dir }}/traefik.key"
+
+- name: 'Generate SSL certificate request'
+  openssl_csr:
+    path: "{{ gluster_mount_dir }}/traefik.csr"
+    privatekey_path: "{{ gluster_mount_dir }}/traefik.key"
+    common_name: "*.{{ traefik_domain }}"
+
+- name: 'Self-sign SSL certificate'
+  openssl_certificate:
+    path: "{{ gluster_mount_dir }}/traefik.crt"
+    privatekey_path: "{{ gluster_mount_dir }}/traefik.key"
+    csr_path: "{{ gluster_mount_dir }}/traefik.csr"
+    provider: selfsigned
+
 - name: 'Deploy Traefik'
   docker_swarm_service:
     name: 'traefik'
     image: 'traefik'
-    args:
-      - 'traefik'
+    command:
+      - '/traefik'
       - '--docker'
       - '--docker.swarmMode'
-      - "--docker.domain={{ traefik_domain }}"
+      - "--docker.domain={{ traefik_domain}}"
       - '--docker.watch'
-      - '--api'
+      - '--defaultentrypoints=http,https'
+      - '--entryPoints=Name:https Address::443 TLS:/certs/traefik.crt,/certs/traefik.key'
+      - '--entryPoints=Name:http Address::80 Redirect.EntryPoint:https'
     mounts:
       - source: '/var/run/docker.sock'
         target: '/var/run/docker.sock'
+        type: 'bind'
+      - source: "{{ gluster_mount_dir }}/traefik.crt"
+        target: '/certs/traefik.crt'
+        type: 'bind'
+      - source: "{{ gluster_mount_dir }}/traefik.key"
+        target: '/certs/traefik.key'
         type: 'bind'
     networks:
       - 'traefik_backend'

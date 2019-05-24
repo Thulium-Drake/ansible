@@ -5,18 +5,18 @@ docker_package_state: present
 
 # Pip packages required
 pip_install_packages:
-  - name: docker
+  - name: 'docker'
 
 # Gluster paths/settings
 glusterfs_daemon: 'glusterfs-server'
 gluster_brick_dir: "/exports/gluster/{{ inventory_hostname }}"
 gluster_mount_dir: '/data/docker/volumes'
-gluster_brick_name: 'docker_volumes'
+gluster_volume_name: 'docker_volumes'
 
 # Traefik settings
 traefik_domain: 'dckr.zm1.element-networks.nl'
 
-# Mariadb settings
+# Mariadb common settings
 mariadb_root_password: !vault |
           $ANSIBLE_VAULT;1.1;AES256
           65343539616535303032613530313334383537376162656538373665396438356630326138643535
@@ -29,6 +29,7 @@ mariadb_root_password: !vault |
           37383930616638323834
 
 # Gitea settings
+gitea_app_name: 'git'
 gitea_db_password: !vault |
           $ANSIBLE_VAULT;1.1;AES256
           33343238373563323738666264346430653862623235343835326536313738346337316338366138
@@ -41,6 +42,7 @@ gitea_db_password: !vault |
           31633930393061633138
 
 # Drone
+drone_app_name: 'drone'
 drone_agent_rpc_secret: !vault |
           $ANSIBLE_VAULT;1.1;AES256
           33333736663861353334663762633533623333353766333232653361313561663334626535366464
