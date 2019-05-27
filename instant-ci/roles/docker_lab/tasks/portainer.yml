@@ -6,7 +6,7 @@
 
 - name: 'Create directory for container data'
   file:
-    path: "{{ gluster_mount_dir }}/portainer_data"
+    path: "{{ docker_data_dir }}/portainer_data"
     state: 'directory'
 
 - name: 'Deploy Portainer Agent'
@@ -40,7 +40,7 @@
     env:
       - 'AGENT_CLUSTER_ADDR=tasks.portainer_agent'
     mounts:
-      - source: "{{ gluster_mount_dir }}/portainer_data"
+      - source: "{{ docker_data_dir }}/portainer_data"
         target: '/data'
         type: 'bind'
     networks:

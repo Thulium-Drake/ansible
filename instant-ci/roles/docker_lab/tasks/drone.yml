@@ -6,7 +6,7 @@
 
 - name: 'Create directory for container data'
   file:
-    path: "{{ gluster_mount_dir }}/{{ dir }}"
+    path: "{{ docker_data_dir }}/{{ dir }}"
     state: 'directory'
   loop:
     - 'drone_data'
@@ -19,12 +19,12 @@
     name: 'drone_mariadb'
     image: 'mariadb'
     env:
-      - "MYSQL_ROOT_PASSWORD={{ mariadb_root_password }}"
+      - "MYSQL_ROOT_PASSWORD={{ db_root_password }}"
       - 'MYSQL_DATABASE=drone'
       - 'MYSQL_USER=drone'
       - "MYSQL_PASSWORD={{ drone_db_password }}"
     mounts:
-      - source: "{{ gluster_mount_dir }}/drone_db"
+      - source: "{{ docker_data_dir }}/drone_db"
         target: '/var/lib/mysql'
         type: 'bind'
     networks:
@@ -54,7 +54,7 @@
       - source: '/var/run/docker.sock'
         target: '/var/run/docker.sock'
         type: 'bind'
-      - source: "{{ gluster_mount_dir}}/drone_data"
+      - source: "{{ docker_data_dir}}/drone_data"
         target: '/data'
         type: 'bind'
     networks:

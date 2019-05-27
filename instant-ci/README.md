@@ -53,13 +53,14 @@ ansible-playbook main.yml
 When Ansible is done with the setup, you should have access to the following URLs:
 
 * Portainer: https://portainer.dckr.example.com
-* Gitea: https://gitea.example.dckr.com
-* Drone: https://drone.example.dckr.com
+* Gitea: https://gitea.dckr.example.com
+* Drone: https://drone.dckr.example.com
 
 In order to use these, you need to do the following things:
 
 * Create your administrative useraccounts for Portainer and Gitea
   * Drone will use the credentials you use for Gitea
-* Finish the setup of Gitea (just click Install), all information is already filled in!
+  * The default admin user for drone is named 'root', so just name your
+  Gitea user the same and it will have admin privileges in Drone.
 
 Gitea's SSH server is reachable on port 2222
