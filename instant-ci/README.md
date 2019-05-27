@@ -32,6 +32,16 @@ Things to take note of (that I can think of):
 * The SQL servers will not dump their databases on a regular basis! You'd need
 to add a container in the $APP_backend network with access to a disk and a MySQL client
 
+## SSL Certificate
+The role in this lab will automagically create a SSL certificate for the configured domain.
+
+If you want to use your own (wildcard!) certificate, do the following:
+
+* Set ```traefik_selfsign``` to False
+* Make sure you provide ```{{ docker_data_dir }}/traefik_data/traefik.[crt|key]
+
+The rest of the setup will then work just fine!
+
 # Setup
 In order to set this up, do the following:
 
