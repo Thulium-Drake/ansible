@@ -38,7 +38,7 @@ The role in this lab will automagically create a SSL certificate for the configu
 If you want to use your own (wildcard!) certificate, do the following:
 
 * Set ```traefik_selfsign``` to False
-* Make sure you provide ```{{ docker_data_dir }}/traefik_data/traefik.[crt|key]
+* Make sure you provide ```{{ docker_data_dir }}/traefik_data/traefik.[crt|key]```
 
 The rest of the setup will then work just fine!
 
