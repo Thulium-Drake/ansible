@@ -74,3 +74,10 @@ In order to use these, you need to do the following things:
   Gitea user the same and it will have admin privileges in Drone.
 
 Gitea's SSH server is reachable on port 2222
+
+# Destroy lab
+To remove the lab in it's entierity, run the ```remove.yml``` playbook.
+
+```
+ansible-playbook remove.yml
+```

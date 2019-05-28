@@ -1,0 +1,22 @@
+---
+- name: "Remove containers"
+  docker_swarm_service:
+    name: "{{ container }}"
+    state: 'absent'
+  loop: "{{ containers }}"
+  loop_control:
+    loop_var: 'container'
+  delegate_to: "{{ query('inventory_hostnames', 'master')[0] }}"
+  ignore_errors: True
+
+- name: 'Leave Swarm'
+  docker_swarm:
+    state: 'absent'
+    force: True
+  delegate_to: "{{ worker }}"
+  loop: "{{ query('inventory_hostnames', 'all') }}"
+  loop_control:
+    loop_var: 'worker'
+
+- name: 'Prune images'
+  command: 'docker image prune -af'

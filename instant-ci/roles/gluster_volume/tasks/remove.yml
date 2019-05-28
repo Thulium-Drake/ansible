@@ -1,0 +1,28 @@
+---
+- name: 'Ensure Gluster volume is unmounted'
+  mount:
+    name: "{{ gluster_mount_dir }}"
+    src: "{{ inventory_hostname }}:/{{ gluster_volume_name }}"
+    state: 'absent'
+
+- name: 'Remove Gluster volume'
+  gluster_volume:
+    state: 'absent'
+    name: "{{ gluster_volume_name }}"
+    brick: "{{ gluster_brick_dir }}"
+    replicas: "{{ groups.all | length }}"
+    cluster: "{{ groups.all | join(',') }}"
+    host: "{{ inventory_hostname }}"
+    force: True
+  run_once: True
+
+- name: 'Ensure Gluster brick and mount directories removed'
+  file:
+    path: "{{ dir }}"
+    state: 'absent'
+    mode: 0775
+  loop:
+    - "{{ gluster_brick_dir }}"
+    - "{{ gluster_mount_dir }}"
+  loop_control:
+    loop_var: 'dir'
