@@ -1,0 +1,12 @@
+---
+- hosts: 'all'
+  tasks:
+    - name: 'Destroy Docker Swarm'
+      import_role:
+        name: 'docker_lab'
+        tasks_from: 'remove.yml'
+    - name: 'Remove Gluster volume'
+      import_role:
+        name: 'gluster_volume'
+        tasks_from: 'remove.yml'
+
