@@ -46,7 +46,7 @@ The rest of the setup will then work just fine!
 In order to set this up, do the following:
 
 * Create a DNS wildcard record for a subdomain:
- *.dckr.example.com
+ *.dckr.example.com to the Docker Swarm master
 * Create a couple of hosts (physical or virtual)
 * Make sure they have access to the Internet
 * Add them to the hosts file
