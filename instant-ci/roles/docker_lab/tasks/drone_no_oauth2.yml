@@ -43,20 +43,13 @@
       - 'DRONE_USER_CREATE=username:root,admin:true'
       - 'DRONE_DATABASE_DRIVER=mysql'
       - "DRONE_DATABASE_DATASOURCE=drone:{{ drone_db_password}}@tcp(tasks.drone_mariadb:3306)/drone?parseTime=true"
-      - "DRONE_GITEA_SERVER={{ drone_gitea_server }}"
-      - "DRONE_GITEA_CLIENT_ID={{ drone_gitea_client_id }}"
-      - "DRONE_GITEA_CLIENT_SECRET={{ drone_gitea_client_secret }}"
+      - 'DRONE_GITEA_SERVER=http://tasks.gitea:3000'
       - 'DRONE_GIT_ALWAYS_AUTH=true'
       - 'DRONE_RUNNER_CAPACITY=0'
-      - 'DRONE_SERVER_PROTO=https'
-      - "DRONE_SERVER_HOST={{ drone_server_name }}"
+      - 'DRONE_SERVER_PROTO=http'
+      - "DRONE_SERVER_HOST=drone.{{ traefik_domain }}"
       - "DRONE_RPC_SECRET={{ drone_agent_rpc_secret }}"
       - 'DRONE_AGENTS_ENABLED=true'
-    labels:
-      traefik.backend.loadbalancer.sticky: 'true'
-      traefik.docker.network: 'traefik_backend'
-      traefik.port: '80'
-      traefik.frontend.rule: "Host:{{ drone_app_name }}.{{ traefik_domain }}"
     mounts:
       - source: '/var/run/docker.sock'
         target: '/var/run/docker.sock'
@@ -66,8 +59,13 @@
         type: 'bind'
     networks:
       - 'drone_backend'
-      - 'traefik_backend'
       - 'gitea_backend'
+      - 'traefik_backend'
+    labels:
+      traefik.backend.loadbalancer.sticky: 'true'
+      traefik.docker.network: 'traefik_backend'
+      traefik.port: '80'
+      traefik.frontend.rule: "Host:{{ drone_app_name }}.{{ traefik_domain }}"
     mode: 'replicated'
     restart_config:
       condition: 'any'
@@ -79,7 +77,7 @@
     image: 'drone/agent'
     env:
       - "DRONE_RUNNER_CAPACITY={{ drone_runner_cap }}"
-      - 'DRONE_RPC_HOST=tasks.drone'
+      - "DRONE_RPC_HOST=drone.{{ traefik_domain }}"
       - "DRONE_RPC_SECRET={{ drone_agent_rpc_secret }}"
     networks:
       - 'drone_backend'

@@ -64,16 +64,26 @@ When Ansible is done with the setup, you should have access to the following URL
 
 * Portainer: https://portainer.dckr.example.com
 * Gitea: https://gitea.dckr.example.com
-* Drone: https://drone.dckr.example.com
+* Drone: https://drone.dckr.example.com (needs additional setup, see below)
+* Gitea's SSH server is reachable on port 2222
 
 In order to use these, you need to do the following things:
 
 * Create your administrative useraccounts for Portainer and Gitea
-  * Drone will use the credentials you use for Gitea
-  * The default admin user for drone is named 'root', so just name your
-  Gitea user the same and it will have admin privileges in Drone.
+  * Drone will leverage the Oauth2 provider in Gitea
+* In Gitea, go to 'Settings -> Applications'
+* Create a new Oauth2 application
+  * Name: Drone
+  * Redirect URL: https://drone.dckr.example.com/login
+* Put the Client ID and the secret in your group_vars file for the lab host
+* Redeploy Drone
+* Go to the Drone webinterface, you will be redirected to Gitea.
+* Authorize the request from Drone to use Oauth
+* You can now use the Drone interface without extra logins!
 
-Gitea's SSH server is reachable on port 2222
+Alternatively, if you modify ```roles/docker_lab/vars/main.yml``` you can also
+run Drone without SSO. Change ```drone``` to ```drone_no_oauth2```
+
 
 # Destroy lab
 To remove the lab in it's entierity, run the ```remove.yml``` playbook.

@@ -17,3 +17,8 @@ drone_app_name: 'drone'
 drone_db_password: 'NotSoSecretPassword'
 drone_runner_cap: 2
 drone_agent_rpc_secret: 'AllYourCompileJobsAreBelongToUs'
+
+drone_server_name: 'drone.dckr.example.com'
+drone_gitea_server: 'https://gitea.dckr.example.com'
+drone_gitea_client_id: '00000000-0000-0000-0000000000'
+drone_gitea_client_secret: 000000000000000000000000000000000000000

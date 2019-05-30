@@ -1,4 +1,5 @@
 *.swp
 hosts
 instant-ci/galaxy_roles
-instant-ci/ansible-vault
+.ansible-vault
+instant-ci/group_vars
