@@ -52,6 +52,7 @@
       - "DRONE_SERVER_HOST={{ drone_server_name }}"
       - "DRONE_RPC_SECRET={{ drone_agent_rpc_secret }}"
       - 'DRONE_AGENTS_ENABLED=true'
+      - 'DRONE_JSONNET_ENABLED=true'
     labels:
       traefik.backend.loadbalancer.sticky: 'true'
       traefik.docker.network: 'traefik_backend'
