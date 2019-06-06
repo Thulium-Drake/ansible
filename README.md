@@ -8,5 +8,6 @@ Check them out at https://galaxy.ansible.com/thulium_drake
 # Example setups and other stuff
 * [vmware-example-setup](vmware-example-setup/): Ansible environment for use with VMWare, for use a guide to setup.
 * [molecule-setup](molecule-setup/): Ansible environment to setup Molecule on a system
+* [instant-ci](instant-ci/): Ansible environment to setup a Docker mini CI street with Drone and Gitea
 
 Have fun!
