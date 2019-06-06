@@ -3,8 +3,8 @@
   roles:
     - 'pip'
     - 'docker'
-    - 'glusterfs'
-    - 'gluster_volume'
+      #- 'glusterfs'
+      #- 'gluster_volume'
 
 - hosts: 'master'
   roles:

@@ -49,10 +49,20 @@ In order to set this up, do the following:
  *.dckr.example.com to the Docker Swarm master
 * Create a couple of hosts (physical or virtual)
 * Make sure they have access to the Internet
-* Add them to the hosts file
+* Add them to the hosts
 * Install all requirements
 ```
 ansible-galaxy install -r requirements.yml
+```
+* Copy the defaults file from roles/docker_lab/defaults to group_vars/all.yml
+  * If you use gluster as well, add the values from roles/gluster_volume/defaults as well!
+```
+cat roles/gluster_volume/defaults/main.yml >> group_vars/all.yml
+```
+  * Add the following lines to group_vars/all.yml
+```
+pip_install_packages:
+    - name: 'docker'
 ```
 * Run Ansible
 ```
