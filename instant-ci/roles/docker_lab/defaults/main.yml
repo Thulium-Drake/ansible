@@ -1,4 +1,6 @@
 ---
+docker_package: "docker-{{ docker_edition }}"
+docker_package_state: present
 docker_edition: 'ce'
 
 docker_data_dir: '/data/docker/volumes'
